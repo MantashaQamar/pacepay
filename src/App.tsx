@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import confetti from 'canvas-confetti';
 import { Navbar } from './components/Navbar';
 import { VaultSummaryBar } from './components/VaultSummaryBar';
@@ -7,9 +7,10 @@ import { QuickExpenseBar } from './components/QuickExpenseBar';
 import { LiveExpenseList } from './components/LiveExpenseList';
 import { AIPanel } from './components/AIPanel';
 import { ProfileModal } from './components/ProfileModal';
+import { GuideModal } from './components/GuideModal';
 import type { UserFinancialProfile, Expense } from './types';
 import { calculatePacing } from './utils/pacingEngine';
-import { Sparkles, Shield, ArrowUpRight } from 'lucide-react';
+import { Sparkles, Shield, ArrowUpRight, HelpCircle } from 'lucide-react';
 
 const INITIAL_PROFILE: UserFinancialProfile = {
   monthlyIncome: 100000,
@@ -43,7 +44,17 @@ export function App() {
   const [profile, setProfile] = useState<UserFinancialProfile>(INITIAL_PROFILE);
   const [expenses, setExpenses] = useState<Expense[]>(INITIAL_EXPENSES);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isGuideOpen, setIsGuideOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  // Check if first-time visitor
+  useEffect(() => {
+    const hasSeenGuide = localStorage.getItem('pacepay_guide_seen');
+    if (!hasSeenGuide) {
+      setIsGuideOpen(true);
+      localStorage.setItem('pacepay_guide_seen', 'true');
+    }
+  }, []);
 
   // Compute pacing
   const pacing = calculatePacing(profile, expenses);
@@ -134,8 +145,28 @@ export function App() {
       <Navbar
         profile={profile}
         onOpenSettings={() => setIsSettingsOpen(true)}
+        onOpenGuide={() => setIsGuideOpen(true)}
         onResetDemo={handleResetDemo}
       />
+
+      {/* First-timer Welcome Banner */}
+      <div className="bg-gradient-to-r from-sky-950/40 via-blue-900/20 to-indigo-950/40 border-b border-slate-800/80 px-4 py-2.5">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-xs">
+          <div className="flex items-center gap-2 text-slate-300">
+            <span className="w-2 h-2 rounded-full bg-sky-400 animate-ping"></span>
+            <span>
+              <strong>New to PacePay?</strong> We automatically lock your savings on Day 1 and calculate what you can safely spend today without guilt.
+            </span>
+          </div>
+          <button
+            onClick={() => setIsGuideOpen(true)}
+            className="flex items-center gap-1 text-sky-400 hover:text-sky-300 font-semibold underline underline-offset-2 shrink-0 transition"
+          >
+            <HelpCircle className="w-3.5 h-3.5" />
+            <span>Read 1-Minute Visual Guide</span>
+          </button>
+        </div>
+      </div>
 
       {/* Main Container */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 lg:px-8 py-6 space-y-8">
@@ -208,6 +239,12 @@ export function App() {
         isOpen={isSettingsOpen}
         onClose={() => setIsSettingsOpen(false)}
         onSave={handleSaveProfile}
+      />
+
+      {/* First-Timer Visual Guide Modal */}
+      <GuideModal
+        isOpen={isGuideOpen}
+        onClose={() => setIsGuideOpen(false)}
       />
     </div>
   );
