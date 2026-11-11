@@ -216,3 +216,4 @@ export const GuideModal: React.FC<GuideModalProps> = ({ isOpen, onClose }) => {
     </div>
   );
 };
+
