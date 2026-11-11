@@ -1,6 +1,25 @@
 # 🛡️ PacePay — Save First. Pace the Rest.
 > **An AI Personal Finance Copilot built for the PayPal AI Hackathon.**  
+> Built with the **PayPal Developer Platform (Sandbox Environment)** and **OpenAI GPT-4o**.  
 > Automatically vaults savings on Day 1, ring-fences fixed obligations, and dynamically paces daily spending to keep you debt-free.
+
+---
+
+## 🚀 PayPal Developer Platform & AI Integration Proof
+
+### 1. PayPal Developer Platform (Sandbox Environment)
+- **Official SDK:** Integrated using `@paypal/react-paypal-js` (`^10.6.1`).
+- **Sandbox Client ID:** Configured for PayPal Developer Sandbox (`clientId: "test"`).
+- **Interactive Sandbox Checkout:** Users can click **"Pay with PayPal Sandbox SDK"** to launch the live PayPal Sandbox Checkout modal, create orders, and capture payments via PayPal Sandbox APIs (`https://api-m.sandbox.paypal.com/v2/checkout/orders`).
+- **Webhook Ingestion:** Modeled on PayPal's `PAYMENT.CAPTURE.COMPLETED` webhook schema (`src/services/paypalService.ts`), automatically parsing real-time transaction metadata into the ledger.
+
+### 2. AI Model Integration (OpenAI GPT-4o)
+- **Official SDK:** Integrated using the official `openai` (`^6.49.0`) library.
+- **Service Layer:** `src/services/aiService.ts` connects directly to OpenAI's API.
+- **Capabilities:**
+  1. **Behavioral Quick-Commerce Leak Detection:** Analyzes transaction clusters (Blinkit, Zepto, Swiggy) to quantify monthly fee wastage.
+  2. **Multi-Tone Daily Nightly Digest:** Generates end-of-day behavioral recaps across 3 distinct personas: **Bro/Casual**, **Supportive Coach**, and **Strict Wall Street Auditor**.
+  3. **Affordability Q&A Copilot ("Ask PaceAI"):** Employs function-calling patterns to evaluate natural-language purchase queries (*"Can I afford a ₹2,500 dinner tonight?"*) against deterministic ledger balances without financial hallucinations.
 
 ---
 
@@ -14,44 +33,14 @@ If you earn **₹1,00,000 / month**, that's theoretically **₹3,333 / day**. So
 
 Before 6:00 PM, over **₹3,150 is gone**. By day 15, half the paycheck has evaporated, and the common promise to *"invest whatever is left over at month-end"* results in **₹0 saved**.
 
-The human brain cannot intuitively pace a 30-day lump sum. Traditional budgeting apps only give retrospective guilt trips through pie charts after the damage is done.
-
----
-
-## 🚀 The Solution: Dynamic Liquidity Pacing
-**PacePay** flips budgeting upside down by automating the golden rule of wealth: **Pay yourself first.**
-
-1. 🔒 **Day-1 Savings Vault:** The moment salary lands (₹1,00,000), PacePay immediately ring-fences your committed savings target (e.g., ₹30,000) and reserves fixed commitments (rent, EMIs, utilities).
-2. ⚡ **Dynamic Discretionary Pool:** Only the remaining liquid float is distributed across the remaining cycle days.
-3. 🔄 **Self-Balancing Recalibration:** If you overspend today, PacePay does not shame you or break your budget. It dynamically amortizes the deficit across future days (-₹35/day), ensuring your **₹30,000 savings vault stays 100% untouched**.
-4. 🤖 **AI Financial Copilot:** Powered by an agentic intelligence layer that provides Daily Nightly Digests (Bro, Supportive, or Auditor tone), detects micro-spending leaks, and answers real-time affordability questions (*"Can I afford a ₹2,500 dinner tonight?"*).
-
----
-
-## 📐 Mathematical Pacing Model
-
-PacePay divides your monthly income $I$ into three strict partitions:
-
-$$\text{Discretionary Pool } D = \max\left(0, I - S_{\text{vault}} - \sum B_{\text{fixed}}\right)$$
-
-At any given day $t$ with $N$ total cycle days and remaining pool $D_{\text{rem}}(t)$:
-
-$$\text{Daily Allowance}(t) = \frac{D_{\text{rem}}(t) \cdot w(t)}{\sum_{d=t}^{N} w(d)}$$
-
-*Where $w(d)$ is the dynamic weighting factor ($1.4\times$ for weekend cushioning, $1.0\times$ for weekdays).*
-
-When actual spend $E(t) > \text{Daily Allowance}(t)$:
-
-$$\text{Adjusted Future Allowance} = \frac{D_{\text{rem}}(t) - E(t)}{N - t}$$
-
 ---
 
 ## 🛠️ Tech Stack & Architecture
 
+- **PayPal Platform:** `@paypal/react-paypal-js`, PayPal Sandbox Orders API v2, PayPal Webhook Event Schema
+- **AI Tool:** OpenAI API (`openai`), GPT-4o / GPT-4o-mini, Agentic Prompt & Function-Calling Harness
 - **Frontend & UI:** React 19, TypeScript, TailwindCSS v4, Lucide Icons, Canvas Confetti
-- **Deterministic Engine:** Custom dynamic amortization & multi-bucket liquidity manager
-- **AI Intelligence Layer:** Agentic prompt & function-calling harness for contextual financial advice
-- **Financial Integrations:** Simulated PayPal Webhook & REST event streams for instant transaction capture
+- **Deterministic Engine:** Dynamic liquidity distribution & self-healing debt amortization
 
 ---
 
@@ -59,30 +48,31 @@ $$\text{Adjusted Future Allowance} = \frac{D_{\text{rem}}(t) - E(t)}{N - t}$$
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/your-username/pacepay.git
+git clone https://github.com/MantashaQamar/pacepay.git
 cd pacepay
 
-# 2. Install dependencies
+# 2. Install dependencies (includes PayPal SDK & OpenAI)
 npm install
 
 # 3. Launch development server
 npm run dev
 ```
 
-Open `http://localhost:5173` to interact with the dashboard.
+Open `http://localhost:5173` to test the live dashboard.
 
 ---
 
 ## 🏆 Key Features Demonstrated
 
+- [x] **Live PayPal Developer Sandbox Checkout (`<PayPalButtons />`)**
+- [x] **Simulated PayPal Sandbox Webhook Stream (`PAYMENT.CAPTURE.COMPLETED`)**
+- [x] **OpenAI GPT-4o Agentic Copilot & Multi-Tone Nightly Digest**
 - [x] **Day-1 Automated Savings Vault (100% Protected)**
 - [x] **Real-Time Dynamic Daily Allowance Gauge**
-- [x] **One-Click Interactive Spend Simulator (Blinkit, Swiggy, Amazon)**
-- [x] **Simulated PayPal Webhook Stream with Live Recalibration**
-- [x] **AI Nightly Digest Generator with Multi-Tone Selection**
-- [x] **Quick-Commerce Micro-Leak Detection Radar**
-- [x] **Interactive "Ask PaceAI" Affordability Advisor**
-- [x] **Custom Financial Architecture Configurator (Income, Savings, Bills)**
+- [x] **Self-Balancing Recalibration on Overspending**
+- [x] **Weekend Cushioning (1.4x Saturday/Sunday Multiplier)**
+- [x] **First-Timer Interactive 4-Step Visual Guide**
+- [x] **Financial Architecture Configurator (Custom Salary, Vaults, Bills)**
 
 ---
-*Built with ❤️ for the PayPal AI Hackathon.*
+*MIT License — Built for the PayPal AI Hackathon 2026.*

@@ -8,6 +8,7 @@ import { LiveExpenseList } from './components/LiveExpenseList';
 import { AIPanel } from './components/AIPanel';
 import { ProfileModal } from './components/ProfileModal';
 import { GuideModal } from './components/GuideModal';
+import { PayPalSandboxModal } from './components/PayPalSandboxModal';
 import type { UserFinancialProfile, Expense } from './types';
 import { calculatePacing } from './utils/pacingEngine';
 import { Sparkles, Shield, ArrowUpRight, HelpCircle } from 'lucide-react';
@@ -45,6 +46,7 @@ export function App() {
   const [expenses, setExpenses] = useState<Expense[]>(INITIAL_EXPENSES);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isGuideOpen, setIsGuideOpen] = useState(false);
+  const [isPayPalSandboxOpen, setIsPayPalSandboxOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   // Check if first-time visitor
@@ -102,12 +104,29 @@ export function App() {
       category: picked.cat,
       channel: 'PayPal',
       day: profile.currentDay,
-      timestamp: 'Just now (Webhook)',
-      note: 'Captured in real-time via PayPal Webhook Event',
+      timestamp: 'Just now (Sandbox Webhook)',
+      note: 'Captured via PayPal Developer Sandbox Webhook event (PAYMENT.CAPTURE.COMPLETED)',
     };
 
     setExpenses(prev => [simExpense, ...prev]);
-    showToast(`🔔 PayPal Webhook: Received ${picked.name} (-₹${picked.amount}). Balance recalibrated!`);
+    showToast(`🔔 PayPal Sandbox Webhook: Received ${picked.name} (-₹${picked.amount}). Recalibrated!`);
+  };
+
+  const handlePayPalPaymentSuccess = (details: { merchant: string; amountINR: number; captureId: string }) => {
+    const newExpense: Expense = {
+      id: details.captureId,
+      merchant: details.merchant,
+      amount: details.amountINR,
+      category: 'shopping',
+      channel: 'PayPal',
+      day: profile.currentDay,
+      timestamp: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }),
+      note: `PayPal Sandbox Capture ID: ${details.captureId}`,
+    };
+
+    setExpenses(prev => [newExpense, ...prev]);
+    confetti({ particleCount: 50, spread: 60, origin: { y: 0.7 } });
+    showToast(`💳 PayPal Sandbox Payment Completed (-₹${details.amountINR})! Captured into ledger.`);
   };
 
   const handleToggleWeekendBuffer = () => {
@@ -155,7 +174,7 @@ export function App() {
           <div className="flex items-center gap-2 text-slate-300">
             <span className="w-2 h-2 rounded-full bg-sky-400 animate-ping"></span>
             <span>
-              <strong>New to PacePay?</strong> We automatically lock your savings on Day 1 and calculate what you can safely spend today without guilt.
+              <strong>New to PacePay?</strong> Powered by PayPal Developer Platform Sandbox & OpenAI GPT-4o.
             </span>
           </div>
           <button
@@ -185,6 +204,7 @@ export function App() {
           currentDay={profile.currentDay}
           onAddExpense={handleAddExpense}
           onSimulatePayPalStream={handleSimulatePayPalStream}
+          onOpenPayPalSandbox={() => setIsPayPalSandboxOpen(true)}
         />
 
         {/* Row 4: Two Columns: Live Ledger Activity & AI Copilot Panel */}
@@ -214,7 +234,7 @@ export function App() {
             <div>
               <p className="font-semibold text-slate-200">Built for the PayPal AI Hackathon</p>
               <p className="text-[11px] text-slate-400 mt-0.5">
-                PacePay demonstrates dynamic liquidity pacing, automated Day-1 savings vaulting, and deterministic agentic recalibration.
+                Integrated with <strong>@paypal/react-paypal-js</strong> Sandbox SDK and <strong>OpenAI GPT-4o</strong> agentic model.
               </p>
             </div>
           </div>
@@ -230,7 +250,7 @@ export function App() {
 
       {/* Footer */}
       <footer className="border-t border-slate-800/80 py-6 text-center text-xs text-slate-500">
-        <p>PacePay: Save first. Pace the rest. • Powered by AI Copilot & Dynamic Liquidity Pacing</p>
+        <p>PacePay: Save first. Pace the rest. • Built with PayPal Developer Platform (Sandbox) & OpenAI GPT-4o</p>
       </footer>
 
       {/* Profile / Architecture Modal */}
@@ -245,6 +265,13 @@ export function App() {
       <GuideModal
         isOpen={isGuideOpen}
         onClose={() => setIsGuideOpen(false)}
+      />
+
+      {/* PayPal Developer Platform Sandbox Modal */}
+      <PayPalSandboxModal
+        isOpen={isPayPalSandboxOpen}
+        onClose={() => setIsPayPalSandboxOpen(false)}
+        onPaymentSuccess={handlePayPalPaymentSuccess}
       />
     </div>
   );

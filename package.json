@@ -10,9 +10,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@paypal/react-paypal-js": "^10.6.1",
     "@tailwindcss/vite": "^4.3.4",
     "canvas-confetti": "^1.9.4",
     "lucide-react": "^1.68.0",
+    "openai": "^6.49.0",
     "react": "^19.3.1",
     "react-dom": "^19.3.1"
   },
